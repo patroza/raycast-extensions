@@ -6,6 +6,7 @@ import { runAppleScriptSync } from "run-applescript";
 import tildify from "tildify";
 import { fileURLToPath } from "url";
 import { RemoveMethods, useRecentEntries } from "./db";
+import child_process from "child_process"
 import {
   ListOrGrid,
   ListOrGridDropdown,
@@ -46,6 +47,11 @@ export default function Command() {
   const [type, setType] = useState<EntryType | null>(null);
   const { pinnedEntries, ...pinnedMethods } = usePinnedEntries();
 
+  console.log({ error, isLoading, data: data?.length }, data
+    ?.filter(filterEntriesByType(type)).length,
+
+    type)
+
   if (error) {
     showToast(Toast.Style.Failure, "Failed to load recent projects");
     return (
@@ -73,18 +79,16 @@ export default function Command() {
       filtering={{ keepSectionOrder }}
       searchBarAccessory={<EntryTypeDropdown onChange={setType} />}
     >
-      <ListOrGridSection title="Pinned Projects">
+      {/* <ListOrGridSection title="Pinned Projects">
         {pinnedEntries.filter(filterEntriesByType(type)).map((entry: EntryLike, index: number) => (
           <EntryItem key={`pinned-${index}`} entry={entry} pinned={true} {...pinnedMethods} {...removeMethods} />
         ))}
-      </ListOrGridSection>
+      </ListOrGridSection> */}
       <ListOrGridSection title="Recent Projects">
-        {data
-          ?.filter(filterUnpinnedEntries(pinnedEntries))
-          ?.filter(filterEntriesByType(type))
-          .map((entry: EntryLike, index: number) => (
-            <EntryItem key={index} entry={entry} {...pinnedMethods} {...removeMethods} />
-          ))}
+        {/* {data?.map(_ => <div>{JSON.stringify(_)}</div>)} */}
+        {data?.filter(_ => "folderUri" in _).map((entry: EntryLike, index: number) => (
+          <EntryItem key={index} entry={entry} {...pinnedMethods} {...removeMethods} />
+        ))}
       </ListOrGridSection>
     </ListOrGrid>
   );
@@ -157,6 +161,8 @@ function LocalItem(
     return getEditorApplication(build);
   });
 
+  console.log({ name, path, prettyPath, subtitle, keywords, gitBranch, editorApp })
+
   useEffect(() => {
     let mounted = true;
 
@@ -194,7 +200,13 @@ function LocalItem(
         end tell
         `);
       }
-      open(props.uri, bundleIdentifier);
+      const uri = props.uri.replace("file://", "")
+      const id = uri.split("/").pop()
+      console.log("opening", `code "${uri}"`)
+      // TODO: and activate the window... focus with hyprctl?!
+      child_process.exec(`omarchy-launch-or-focus "${id} - Visual Studio Code" "code ""${uri}"""`);
+      // TODO: and close raycast
+      //open(props.uri, bundleIdentifier);
     };
   };
 
@@ -232,14 +244,14 @@ function LocalItem(
               icon={editorApp ? { fileIcon: editorApp.path } : "action-icon.png"}
               onAction={getAction()}
             />
-            <Action.ShowInFinder path={path} />
-            <Action
+            {/* <Action.ShowInFinder path={path} /> */}
+            {/* <Action
               title={getTitle(true)}
               icon={editorApp ? { fileIcon: editorApp.path } : "action-icon.png"}
               onAction={getAction(true)}
               shortcut={{ modifiers: ["cmd", "shift"], key: "enter" }}
-            />
-            <Action.OpenWith path={path} shortcut={{ modifiers: ["cmd"], key: "o" }} />
+            /> */}
+            {/* <Action.OpenWith path={path} shortcut={{ modifiers: ["cmd"], key: "o" }} /> */}
             {isFolderEntry(props.entry) && terminalApp && (
               <Action
                 title={`Open with ${terminalApp.name}`}
