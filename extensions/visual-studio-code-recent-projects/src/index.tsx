@@ -156,7 +156,7 @@ function LocalItem(
     return getEditorApplication(build);
   });
 
-  console.log({ name, path, prettyPath, subtitle, keywords, gitBranch, editorApp })
+  //console.log({ name, path, prettyPath, subtitle, keywords, gitBranch, editorApp })
 
   useEffect(() => {
     let mounted = true;
@@ -223,7 +223,7 @@ function LocalItem(
   }
 
   const displaySubtitle = showGitBranch && gitBranch && layout === "grid" ? `${gitBranch} • ${subtitle}` : subtitle;
-
+  console.log({ path })
   return (
     <ListOrGridItem
       id={props.pinned ? path : undefined}
@@ -242,12 +242,12 @@ function LocalItem(
               onAction={getAction()}
             />
             {/* <Action.ShowInFinder path={path} /> */}
-            {/* <Action
+            <Action
               title={getTitle(true)}
-              icon={editorApp ? { fileIcon: editorApp.path } : "action-icon.png"}
+              //icon={editorApp ? { fileIcon: editorApp.path } : "action-icon.png"}
               onAction={getAction(true)}
               shortcut={{ modifiers: ["cmd", "shift"], key: "enter" }}
-            /> */}
+            />
             {/* <Action.OpenWith path={path} shortcut={{ modifiers: ["cmd"], key: "o" }} /> */}
             {isFolderEntry(props.entry) && terminalApp && (
               <Action

@@ -33,7 +33,6 @@ export function useRecentEntries() {
 
   const entries = data && data.length ? data[0].entries : undefined;
   const parsedEntries = entries ? (JSON.parse(entries) as EntryLike[]) : undefined;
-  console.log("dude", {parsedEntries})
 
   async function removeEntry(entry: EntryLike) {
     if (!parsedEntries) {
