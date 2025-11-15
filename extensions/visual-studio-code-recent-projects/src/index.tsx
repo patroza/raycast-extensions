@@ -223,7 +223,6 @@ function LocalItem(
   }
 
   const displaySubtitle = showGitBranch && gitBranch && layout === "grid" ? `${gitBranch} • ${subtitle}` : subtitle;
-  console.log({ path })
   return (
     <ListOrGridItem
       id={props.pinned ? path : undefined}
