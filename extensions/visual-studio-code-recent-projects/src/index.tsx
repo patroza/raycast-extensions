@@ -229,7 +229,7 @@ function LocalItem(
       id={props.pinned ? path : undefined}
       title={name}
       subtitle={displaySubtitle}
-      icon={{ fileIcon: path }}
+      // icon={{ fileIcon: path }}
       content={{ fileIcon: path }}
       keywords={keywords}
       accessories={accessories}
@@ -252,7 +252,7 @@ function LocalItem(
             {isFolderEntry(props.entry) && terminalApp && (
               <Action
                 title={`Open with ${terminalApp.name}`}
-                icon={{ fileIcon: terminalApp.path }}
+                // icon={{ fileIcon: terminalApp.path }}
                 shortcut={{ modifiers: ["cmd", "shift"], key: "o" }}
                 onAction={() =>
                   open(path, terminalApp).catch(() =>

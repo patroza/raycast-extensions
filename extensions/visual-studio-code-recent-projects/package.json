@@ -189,7 +189,6 @@
       "type": "textfield",
       "title": "Git Integration Color",
       "required": false,
-      "label": "Git Branch Color",
       "default": "",
       "description": "Hexadecimal color code for Git branch tag (e.g., #00FF00). Leave empty to use default green"
     }
