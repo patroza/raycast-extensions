@@ -1,4 +1,4 @@
-import { Action, ActionPanel, Color, Grid, Icon, open, openExtensionPreferences, showToast, Toast } from "@raycast/api";
+import { Action, ActionPanel, closeMainWindow, Color, Grid, Icon, open, openExtensionPreferences, showToast, Toast } from "@raycast/api";
 import { usePromise } from "@raycast/utils";
 import { basename, dirname } from "path";
 import { useEffect, useState } from "react";
@@ -44,13 +44,8 @@ import { getGitBranch } from "./utils/git";
 
 export default function Command() {
   const { data, isLoading, error, ...removeMethods } = useRecentEntries();
-  const [type, setType] = useState<EntryType | null>(null);
+  const [type, setType] = useState<EntryType | null>(EntryType.AllTypes);
   const { pinnedEntries, ...pinnedMethods } = usePinnedEntries();
-
-  console.log({ error, isLoading, data: data?.length }, data
-    ?.filter(filterEntriesByType(type)).length,
-
-    type)
 
   if (error) {
     showToast(Toast.Style.Failure, "Failed to load recent projects");
@@ -99,11 +94,11 @@ function EntryTypeDropdown(props: { onChange: (type: EntryType) => void }) {
     <ListOrGridDropdown
       tooltip="Filter project types"
       defaultValue={EntryType.AllTypes}
-      storeValue
+      //storeValue
       onChange={(value) => props.onChange(value as EntryType)}
     >
-      <ListOrGridDropdownItem title="All Types" value="All Types" />
       <ListOrGridDropdownSection>
+        <ListOrGridDropdownItem title="All Types" value="All Types" />
         {Object.values(EntryType)
           .filter((key) => key !== "All Types")
           .sort()
@@ -201,11 +196,13 @@ function LocalItem(
         `);
       }
       const uri = props.uri.replace("file://", "")
-      const id = uri.split("/").pop()
-      console.log("opening", `code "${uri}"`)
-      // TODO: and activate the window... focus with hyprctl?!
+      let id = uri.split("/").pop()
+      if (id?.endsWith(".code-workspace")) {
+        id = id.replace(".code-workspace", "") + " \\(Workspace\\)"
+      }
+      console.log("opening", id, `code "${uri}"`)
       child_process.exec(`omarchy-launch-or-focus "${id} - Visual Studio Code" "code ""${uri}"""`);
-      // TODO: and close raycast
+      closeMainWindow({ clearRootSearch: true });
       //open(props.uri, bundleIdentifier);
     };
   };
