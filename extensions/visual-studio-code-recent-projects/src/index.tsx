@@ -1,4 +1,4 @@
-import { Action, ActionPanel, Color, Grid, Icon, open, openExtensionPreferences, showToast, Toast } from "@raycast/api";
+import { Action, ActionPanel, closeMainWindow, Color, Grid, Icon, open, openExtensionPreferences, showToast, Toast } from "@raycast/api";
 import { usePromise } from "@raycast/utils";
 import { basename, dirname } from "path";
 import { useEffect, useState } from "react";
@@ -6,6 +6,7 @@ import { runAppleScriptSync } from "run-applescript";
 import tildify from "tildify";
 import { fileURLToPath } from "url";
 import { RemoveMethods, useRecentEntries } from "./db";
+import child_process from "child_process"
 import {
   ListOrGrid,
   ListOrGridDropdown,
@@ -43,7 +44,7 @@ import { getGitBranch } from "./utils/git";
 
 export default function Command() {
   const { data, isLoading, error, ...removeMethods } = useRecentEntries();
-  const [type, setType] = useState<EntryType | null>(null);
+  const [type, setType] = useState<EntryType | null>(EntryType.AllTypes);
   const { pinnedEntries, ...pinnedMethods } = usePinnedEntries();
 
   if (error) {
@@ -73,18 +74,16 @@ export default function Command() {
       filtering={{ keepSectionOrder }}
       searchBarAccessory={<EntryTypeDropdown onChange={setType} />}
     >
-      <ListOrGridSection title="Pinned Projects">
+      {/* <ListOrGridSection title="Pinned Projects">
         {pinnedEntries.filter(filterEntriesByType(type)).map((entry: EntryLike, index: number) => (
           <EntryItem key={`pinned-${index}`} entry={entry} pinned={true} {...pinnedMethods} {...removeMethods} />
         ))}
-      </ListOrGridSection>
+      </ListOrGridSection> */}
       <ListOrGridSection title="Recent Projects">
-        {data
-          ?.filter(filterUnpinnedEntries(pinnedEntries))
-          ?.filter(filterEntriesByType(type))
-          .map((entry: EntryLike, index: number) => (
-            <EntryItem key={index} entry={entry} {...pinnedMethods} {...removeMethods} />
-          ))}
+        {/* {data?.map(_ => <div>{JSON.stringify(_)}</div>)} */}
+        {data?.filter(_ => "folderUri" in _).map((entry: EntryLike, index: number) => (
+          <EntryItem key={index} entry={entry} {...pinnedMethods} {...removeMethods} />
+        ))}
       </ListOrGridSection>
     </ListOrGrid>
   );
@@ -95,11 +94,11 @@ function EntryTypeDropdown(props: { onChange: (type: EntryType) => void }) {
     <ListOrGridDropdown
       tooltip="Filter project types"
       defaultValue={EntryType.AllTypes}
-      storeValue
+      //storeValue
       onChange={(value) => props.onChange(value as EntryType)}
     >
-      <ListOrGridDropdownItem title="All Types" value="All Types" />
       <ListOrGridDropdownSection>
+        <ListOrGridDropdownItem title="All Types" value="All Types" />
         {Object.values(EntryType)
           .filter((key) => key !== "All Types")
           .sort()
@@ -157,6 +156,8 @@ function LocalItem(
     return getEditorApplication(build);
   });
 
+  console.log({ name, path, prettyPath, subtitle, keywords, gitBranch, editorApp })
+
   useEffect(() => {
     let mounted = true;
 
@@ -194,7 +195,15 @@ function LocalItem(
         end tell
         `);
       }
-      open(props.uri, bundleIdentifier);
+      const uri = props.uri.replace("file://", "")
+      let id = uri.split("/").pop()
+      if (id?.endsWith(".code-workspace")) {
+        id = id.replace(".code-workspace", "") + " \\(Workspace\\)"
+      }
+      console.log("opening", id, `code "${uri}"`)
+      child_process.exec(`omarchy-launch-or-focus "${id} - Visual Studio Code" "code ""${uri}"""`);
+      closeMainWindow({ clearRootSearch: true });
+      //open(props.uri, bundleIdentifier);
     };
   };
 
@@ -232,14 +241,14 @@ function LocalItem(
               icon={editorApp ? { fileIcon: editorApp.path } : "action-icon.png"}
               onAction={getAction()}
             />
-            <Action.ShowInFinder path={path} />
-            <Action
+            {/* <Action.ShowInFinder path={path} /> */}
+            {/* <Action
               title={getTitle(true)}
               icon={editorApp ? { fileIcon: editorApp.path } : "action-icon.png"}
               onAction={getAction(true)}
               shortcut={{ modifiers: ["cmd", "shift"], key: "enter" }}
-            />
-            <Action.OpenWith path={path} shortcut={{ modifiers: ["cmd"], key: "o" }} />
+            /> */}
+            {/* <Action.OpenWith path={path} shortcut={{ modifiers: ["cmd"], key: "o" }} /> */}
             {isFolderEntry(props.entry) && terminalApp && (
               <Action
                 title={`Open with ${terminalApp.name}`}

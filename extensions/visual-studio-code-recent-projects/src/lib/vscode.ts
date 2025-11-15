@@ -66,7 +66,7 @@ function getNLSVariable(text: string | undefined): string | undefined {
   }
 }
 const cliPaths: Record<string, string> = {
-  Code: "/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code",
+  Code: "/usr/bin/code",
   "Code - Insiders": "/Applications/Visual Studio Code - Insiders.app/Contents/Resources/app/bin/code",
   Cursor: "/Applications/Cursor.app/Contents/Resources/app/bin/cursor", // it also has code, which is an alias
   Kiro: "/Applications/Kiro.app/Contents/Resources/app/bin/kiro",

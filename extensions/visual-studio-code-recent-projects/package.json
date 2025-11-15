@@ -209,6 +209,7 @@
     "@types/node": "^20.8.10",
     "@types/react": "^18.3.3",
     "@types/sql.js": "^1.4.3",
+    "@vicinae/api": "^0.16.0",
     "eslint": "^7.32.0",
     "eslint-plugin-react": "^7.26.1",
     "react": "^18.2.0",

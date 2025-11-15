@@ -33,6 +33,7 @@ export function useRecentEntries() {
 
   const entries = data && data.length ? data[0].entries : undefined;
   const parsedEntries = entries ? (JSON.parse(entries) as EntryLike[]) : undefined;
+  console.log("dude", {parsedEntries})
 
   async function removeEntry(entry: EntryLike) {
     if (!parsedEntries) {
@@ -83,7 +84,7 @@ export function useRecentEntries() {
 }
 
 function getPath() {
-  return `${homedir()}/Library/Application Support/${build}/User/globalStorage/state.vscdb`;
+  return `${homedir()}/.config/${build}/User/globalStorage/state.vscdb`;
 }
 
 async function saveEntries(entries: EntryLike[]) {
